@@ -1,16 +1,13 @@
 FROM php:8.2-cli-alpine
 
-# Install SQLite dependencies & unzip
-RUN apk add --no-cache sqlite-dev unzip \
+# Install SQLite dependencies & PDO SQLite extension
+RUN apk add --no-cache sqlite-dev \
     && docker-php-ext-install pdo_sqlite
 
 WORKDIR /var/www/html
 
-# Copy application source
+# Copy full application code (all folders are in git)
 COPY . .
-
-# Auto-extract zip file so all subdirectories (config, views, src, database, assets) are present
-RUN if [ -f talenttrack-deploy.zip ]; then unzip -o talenttrack-deploy.zip; fi
 
 # Ensure storage directories exist and have write permissions for SQLite and uploads
 RUN mkdir -p database assets/uploads/resumes assets/uploads/avatars logs \
