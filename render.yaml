@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: talenttrack
+    env: docker
+    plan: free
+    region: oregon
+    autoDeploy: true
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: DB_DRIVER
+        value: sqlite
+      - key: SMTP_HOST
+        value: smtp.gmail.com
+      - key: SMTP_PORT
+        value: 465
+      - key: SMTP_USER
+        value: handedotin@gmail.com
+      - key: SMTP_PASS
+        value: tqfnxgfgbyqkyhgw
+      - key: SMTP_FROM
+        value: handedotin@gmail.com
+      - key: SMTP_FROM_NAME
+        value: TalentTrack
