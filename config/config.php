@@ -16,12 +16,21 @@ define('UPLOADS_PATH', ROOT_PATH . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SE
 define('RESUMES_PATH', UPLOADS_PATH . DIRECTORY_SEPARATOR . 'resumes');
 define('AVATARS_PATH', UPLOADS_PATH . DIRECTORY_SEPARATOR . 'avatars');
 
-// Detect Base URL
-$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443)) ? "https://" : "http://";
+// Detect Base URL & Protocol (Supporting Cloud Reverse Proxies like Render, Cloudflare, etc.)
+$isHttps = (
+    (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+    || (isset($_SERVER['SERVER_PORT']) && (int)$_SERVER['SERVER_PORT'] === 443)
+    || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https')
+    || (!empty($_SERVER['HTTP_X_FORWARDED_SSL']) && strtolower($_SERVER['HTTP_X_FORWARDED_SSL']) === 'on')
+);
+$protocol = $isHttps ? "https://" : "http://";
 $host = $_SERVER['HTTP_HOST'] ?? 'localhost:8000';
 $scriptName = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? ''));
-$baseUrl = rtrim($protocol . $host . $scriptName, '/');
-define('BASE_URL', $baseUrl);
+$scriptDir = ($scriptName === '/' || $scriptName === '\\' || $scriptName === '.') ? '' : rtrim($scriptName, '/');
+
+// BASE_URL is root-relative (e.g. "" or "/subfolder"), ensuring CSS/JS/images NEVER suffer mixed-content blocks
+define('BASE_URL', $scriptDir);
+define('FULL_BASE_URL', rtrim($protocol . $host . $scriptDir, '/'));
 
 // Allowed Upload MIME types & extensions
 define('ALLOWED_RESUME_EXTENSIONS', ['pdf', 'doc', 'docx']);
